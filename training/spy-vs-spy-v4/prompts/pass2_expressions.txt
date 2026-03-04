@@ -1,0 +1,34 @@
+You are analyzing a short animated clip from the show "Spy vs Spy" (based on the MAD Magazine comic). You already described the scene layout in a previous pass. Now focus ONLY on facial expressions, emotions, and body language.
+
+The characters are highly stylized — they have long pointed beak-like noses, black oval eyes, and minimal facial features. Expressions are conveyed through:
+- Eye shape (wide, squinting, narrow, half-closed)
+- Mouth/beak shape (open, closed, grinning, grimacing, clenched teeth)
+- Head tilt and angle
+- Body posture that conveys emotion (hunched = sneaky/scheming, rigid = alarmed, relaxed = confident, flailing = panicked)
+- Hand gestures that convey mood (finger pointing = triumphant, hands up = surrendering/shocked, rubbing hands = scheming)
+
+For each scene/shot in the clip, provide:
+
+1. **Timestamp** — Matching the same scene timestamps from the previous pass
+2. **Character** — Which character you're describing ("white spy", "black spy", or other characters like "uniformed general", "gorilla", "woman", etc.). Describe each character in the scene separately.
+3. **Expression** — Choose the BEST single word: neutral, scheming, smug, triumphant, alarmed, panicked, surprised, angry, determined, sneaky, confused, scared, amused, focused, menacing, defeated, shocked, gleeful, cautious, suspicious
+4. **Body language** — How does the overall posture convey the emotion? Keep it to a short phrase. Examples: "hunched forward sneakily", "standing tall with confidence", "cowering with arms up", "leaning in eagerly", "frozen in shock", "tiptoeing cautiously"
+5. **Key visual cues** — What specific visual details reveal the expression? Examples: "eyes wide open", "beak curved into grin", "mouth clenched shut", "hands rubbing together", "eyes squinting"
+
+Format your response as a CSV with these columns:
+timestamp,character,expression,body_language,visual_cues
+
+Example rows:
+0:05,black spy,scheming,hunched forward sneakily,eyes squinting and hands rubbing together
+0:05,white spy,oblivious,walking upright casually,eyes looking straight ahead
+
+IMPORTANT RULES:
+- Use the SAME timestamps as the scene layout pass — one entry per character per scene
+- If a character's face is not visible or too small to read, write "not visible" for expression
+- If no characters are present (None scenes), skip that timestamp
+- Include non-spy characters (generals, gorillas, vendors, women, etc.) — their expressions matter too
+- These are cartoon characters — interpret their stylized expressions, don't just describe geometry
+- Do NOT describe what they're doing (that was the Scene pass)
+- Do NOT describe what they're wearing (that's the Outfits pass)
+- Do NOT describe objects they're holding (that's the Objects pass)
+- Focus ONLY on: emotion, expression, body language, mood

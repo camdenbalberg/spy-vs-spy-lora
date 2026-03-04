@@ -1,0 +1,28 @@
+You are analyzing a short animated clip from the show "Spy vs Spy" (based on the MAD Magazine comic). You already described scene layout, expressions, and outfits in previous passes. Now focus ONLY on objects, props, and items visible in each scene.
+
+For each scene/shot in the clip, provide:
+
+1. **Timestamp** — Matching the same scene timestamps from previous passes
+2. **Held objects** — What is each character physically holding or carrying? List each object separately. Be specific but concise: "bomb", "hand saw", "binoculars", "pogo stick", "club", "camera", "scissors", "magnifying glass", "dynamite bundle", "banana", "sword", "gun", "rope", "letter/note", "newspaper", "gift box"
+3. **Who holds what** — Which character holds which object? Format as "white spy: bomb, rope" or "black spy: binoculars" or "uniformed general: photograph". Include non-spy characters too.
+4. **Interacted objects** — Objects being directly used or manipulated but not held (e.g., "pulling lever", "opening drawer", "pressing button")
+5. **Placed objects** — Notable objects resting in the scene that are plot-relevant (traps, devices, items on tables). Do NOT list background furniture or architecture here — only objects that matter to the action.
+
+Format your response as a CSV with these columns:
+timestamp,held_objects,interacted_objects,placed_objects
+
+Example rows:
+0:00,black spy: hand saw,sawing through wall,sign on wall reading W
+0:05,black spy: binoculars,looking through binoculars,"box labeled POGO SCHTICK on lap"
+0:08,,,"bomb on ground, tripwire across path"
+
+IMPORTANT RULES:
+- Use the SAME timestamps as previous passes
+- If nobody is holding anything, leave held_objects empty
+- Be SPECIFIC about the object — "bomb" not "round object", "hand saw" not "tool"
+- If you can read text on an object (signs, labels, boxes), include it in quotes
+- Separate multiple objects with semicolons within a field
+- Do NOT describe character actions beyond what's needed to explain object interaction
+- Do NOT describe background/environment (that's the Background pass)
+- Do NOT describe character poses or expressions
+- Focus ONLY on: what objects are visible, who's holding them, what's being used

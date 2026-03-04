@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.egg-info/
+build/
+dist/
+*.pyc
+
+# Virtual environments
+venv/
+
+# Model weights
+*.safetensors
+*.ckpt
+*.pth
+
+# Media files
+*.mkv
+*.mp4
+*.avi
+*.zip
+
+# Images (tracked via captions/configs, not raw files)
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# CSV (generated captions)
+*.csv
+
+# sd-scripts (separate repo, too large)
+sd-scripts/
+
+# Tools (portable binaries + upscale models)
+tools/
+
+# Base models
+models/
+
+# Training artifacts (all versions)
+training/*/output/
+training/*/log/
+training/*/upscaled/
+training/*/img/
+training/*/dataset/
+training/*/frames/
+training/*/debug/
+training/*/archive/
+training/*/raw/
+training/*/clean input/
+
+# Generated caption passes
+training/*/captions/gemini_passes/
+
+# Claude Code project config
+.claude/
+
+# IDE / editor
+.vscode/
+
+# Weights & Biases
+wandb/
+
+# Misc
+.env
+*.log
+training_log.txt

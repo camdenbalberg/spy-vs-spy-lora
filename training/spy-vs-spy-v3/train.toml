@@ -1,0 +1,47 @@
+# Spy vs Spy LoRA v3 training config
+# 861 images, 1 repeat
+# Steps per epoch: 861 * 1 / 2 = 430
+# Total steps: 430 * 24 = 10,320
+
+pretrained_model_name_or_path = "C:/Users/Camden/Documents/Coding Projects/LoRA training/models/sdxl/sd_xl_base_1.0.safetensors"
+train_data_dir = "C:/Users/Camden/Documents/Coding Projects/LoRA training/training/spy-vs-spy-v3/img"
+output_dir = "C:/Users/Camden/Documents/Coding Projects/LoRA training/training/spy-vs-spy-v3/output"
+output_name = "spyvspy_sdxl_v3"
+logging_dir = "C:/Users/Camden/Documents/Coding Projects/LoRA training/training/spy-vs-spy-v3/log"
+
+save_model_as = "safetensors"
+save_every_n_epochs = 2
+max_train_epochs = 24
+train_batch_size = 2
+mixed_precision = "bf16"
+no_half_vae = true
+seed = 42
+
+resolution = "1024,1024"
+enable_bucket = true
+min_bucket_reso = 256
+max_bucket_reso = 2048
+bucket_reso_steps = 64
+
+cache_latents = true
+cache_latents_to_disk = true
+gradient_checkpointing = true
+max_data_loader_n_workers = 2
+persistent_data_loader_workers = true
+
+caption_extension = ".txt"
+shuffle_caption = true
+keep_tokens = 1
+max_token_length = 225
+
+optimizer_type = "AdamW8bit"
+learning_rate = 1e-4
+unet_lr = 1e-4
+text_encoder_lr = 5e-5
+lr_scheduler = "cosine_with_restarts"
+lr_scheduler_num_cycles = 3
+lr_warmup_steps = 100
+
+network_module = "networks.lora"
+network_dim = 32
+network_alpha = 16

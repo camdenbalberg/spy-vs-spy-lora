@@ -1,0 +1,26 @@
+You are analyzing a short animated clip from the show "Spy vs Spy" (based on the MAD Magazine comic). You already described scene layout, expressions, outfits, and objects in previous passes. Now focus ONLY on the background environment and setting.
+
+For each scene/shot in the clip, provide:
+
+1. **Timestamp** — Matching the same scene timestamps from previous passes
+2. **Setting type** — Choose the best fit: indoors, outdoors, mixed (e.g., looking through window from outside)
+3. **Location** — Describe the specific location concisely: "city street", "office room", "rooftop", "underground tunnel", "beach", "forest", "laboratory", "bedroom", "factory exterior", "spy headquarters", "open field", "sewer", "bathroom"
+4. **Key features** — List the notable background elements. Examples: "brick wall", "striped wallpaper", "chain-link fence with barbed wire", "palm tree", "desk with lamp", "window showing night sky", "crescent moon", "grassy hill", "wooden fence", "stone pillars with gate"
+5. **Lighting/atmosphere** — Brief note on lighting: "daytime", "nighttime", "dark interior", "bright outdoor", "moonlit", "shadowy"
+
+Format your response as a CSV with these columns:
+timestamp,setting,location,key_features,lighting
+
+Example rows:
+0:00,outdoors,city street,"brick wall; sidewalk; street lamp; wooden fence",daytime
+0:05,indoors,laboratory,"desk with tools; hanging lamp; blueprints on wall",dark interior
+0:12,mixed,spy headquarters exterior,"building labeled WHITE SPY HQ; grassy hill; flag on roof",daytime
+
+IMPORTANT RULES:
+- Use the SAME timestamps as previous passes
+- Keep key_features to the 3-5 most visually prominent background elements
+- Separate multiple features with semicolons
+- Include any readable text on signs, buildings, or labels in quotes
+- Do NOT describe characters, their actions, expressions, or outfits
+- Do NOT describe objects the characters are interacting with (that was the Objects pass)
+- Focus ONLY on: the environment, setting, and background elements behind/around the action

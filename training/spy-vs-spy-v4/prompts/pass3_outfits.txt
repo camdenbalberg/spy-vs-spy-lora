@@ -1,0 +1,35 @@
+You are analyzing a short animated clip from the show "Spy vs Spy" (based on the MAD Magazine comic). You already described scene layout and expressions in previous passes. Now focus ONLY on what each character is wearing.
+
+The STANDARD outfit for both spies is:
+- Fedora hat
+- Long trenchcoat
+- That's it — this is their default, signature look
+
+Your job is to identify any DEVIATIONS from this standard outfit. This is critical because the training data needs to know when a spy is wearing something different.
+
+For each scene/shot in the clip, provide:
+
+1. **Timestamp** — Matching the same scene timestamps from previous passes
+2. **Character** — Which spy ("white spy" or "black spy")
+3. **Hat status** — Is the fedora hat ON or OFF? (on / off / not visible)
+4. **Outfit status** — Is the spy wearing the standard trenchcoat, or something different?
+   - "standard" = normal fedora + trenchcoat
+   - "nonstandard" = wearing a disguise, costume, or different clothing
+5. **Outfit description** — If nonstandard, describe what they're actually wearing. If standard, write "standard". Examples: "scuba gear with tank", "bikini disguise", "lab coat", "military uniform", "wearing flippers on feet", "wrapped in bandages"
+
+Format your response as a CSV with these columns:
+timestamp,character,hat_status,outfit_status,outfit_description
+
+Example rows:
+0:00,black spy,on,standard,standard
+0:05,black spy,off,nonstandard,wearing scuba gear with oxygen tank on back and flippers on feet
+0:08,white spy,on,standard,standard
+
+IMPORTANT RULES:
+- Use the SAME timestamps as previous passes
+- If a character's outfit is not visible (e.g., only hands shown in close-up), write "not visible" for outfit_status
+- If no characters are present (None scenes), skip that timestamp
+- Pay close attention to the hat — it's important for training. If the spy's head is visible and there's no hat, mark it as "off"
+- Accessories worn IN ADDITION to the standard outfit (like gloves, sunglasses, goggles) should be noted in outfit_description but outfit_status remains "standard" — only mark "nonstandard" if the core trenchcoat is replaced
+- Do NOT describe actions, expressions, objects held, or background
+- Focus ONLY on: what is each character wearing?

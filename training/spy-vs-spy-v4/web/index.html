@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Frame Reviewer</title>
+<style>
+:root {
+  --bg: #1e1e2e;
+  --bg2: #282840;
+  --bg3: #333350;
+  --fg: #e0e0e0;
+  --fg2: #a0a0b0;
+  --accent: #7c6ff0;
+  --accent2: #9d8ff5;
+  --red: #e06060;
+  --green: #60c060;
+  --border: #444460;
+  --radius: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+a { color: var(--accent2); text-decoration: none; }
+
+/* ── Header ─────────────────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+header h1 { font-size: 18px; flex: 1; }
+.back-btn {
+  background: var(--bg3); color: var(--fg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 6px 12px; font-size: 14px;
+  cursor: pointer;
+}
+.back-btn:active { background: var(--accent); }
+
+/* ── Episode List ────────────────────────────────────────── */
+#episode-list { padding: 8px; }
+.ep-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+}
+.ep-card:active { background: var(--bg3); }
+.ep-card.reviewed { opacity: 0.5; order: 1; }
+.ep-name { flex: 1; font-weight: 600; font-size: 15px; }
+.ep-meta { font-size: 13px; color: var(--fg2); }
+.ep-check {
+  width: 22px; height: 22px; accent-color: var(--accent);
+}
+
+/* ── Gallery ─────────────────────────────────────────────── */
+#gallery { padding: 8px; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.shot-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+.shot-card.excluded { opacity: 0.35; }
+.shot-card img {
+  width: 100%; aspect-ratio: 4/3;
+  object-fit: cover; display: block;
+}
+.shot-card .shot-label {
+  position: absolute; top: 4px; left: 4px;
+  background: rgba(0,0,0,0.7);
+  color: #fff; font-size: 11px;
+  padding: 2px 6px; border-radius: 4px;
+}
+.shot-card .shot-spy {
+  position: absolute; top: 4px; right: 4px;
+  font-size: 11px; padding: 2px 6px; border-radius: 4px;
+}
+.shot-spy.White { background: rgba(255,255,255,0.85); color: #000; }
+.shot-spy.Black { background: rgba(0,0,0,0.85); color: #fff; border: 1px solid #666; }
+.shot-spy.Both { background: linear-gradient(90deg, #fff 50%, #000 50%);
+  color: transparent; border: 1px solid #666; position: relative; }
+.shot-spy.Both::after { content: "Both"; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(128,128,128,0.75); color: #fff; border-radius: 4px; }
+.shot-caption {
+  padding: 6px 8px; font-size: 12px; color: var(--fg2);
+}
+
+/* ── Shot Detail ─────────────────────────────────────────── */
+#shot-detail { padding: 8px; }
+.detail-frame {
+  width: 100%; border-radius: var(--radius);
+  border: 2px solid var(--accent);
+  margin-bottom: 12px;
+}
+.controls-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.controls-section h3 {
+  font-size: 13px; color: var(--fg2);
+  margin-bottom: 8px; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.field-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+.field-row label {
+  font-size: 14px; min-width: 70px; color: var(--fg2);
+}
+.field-row select, .field-row input[type="text"] {
+  flex: 1; padding: 8px 10px;
+  background: var(--bg3); color: var(--fg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 14px;
+}
+.caption-textarea {
+  width: 100%; min-height: 80px; padding: 10px;
+  background: var(--bg3); color: var(--fg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 14px; font-family: inherit;
+  resize: vertical;
+}
+.suffix-textarea {
+  width: 100%; min-height: 50px; padding: 10px;
+  background: var(--bg3); color: var(--fg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 13px; font-family: inherit;
+  resize: vertical;
+}
+.check-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
+}
+.check-row input[type="checkbox"] {
+  width: 20px; height: 20px; accent-color: var(--accent);
+}
+.check-row label { font-size: 14px; }
+
+.btn {
+  padding: 10px 16px; border: none; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.7; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-sm { padding: 6px 10px; font-size: 13px; }
+.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+
+/* Candidates grid */
+.candidates-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.cand-thumb {
+  position: relative; cursor: pointer;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+.cand-thumb.selected { border-color: var(--accent); }
+.cand-thumb img {
+  width: 100%; aspect-ratio: 4/3;
+  object-fit: cover; display: block;
+}
+.cand-thumb .cand-label {
+  position: absolute; bottom: 2px; left: 2px;
+  background: rgba(0,0,0,0.7); color: #fff;
+  font-size: 10px; padding: 1px 4px; border-radius: 3px;
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent); color: #fff;
+  padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; font-weight: 600;
+  opacity: 0; transition: opacity 0.3s;
+  z-index: 200; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* ── Loading ─────────────────────────────────────────────── */
+.loading {
+  text-align: center; padding: 40px;
+  color: var(--fg2); font-size: 16px;
+}
+.spinner {
+  display: inline-block; width: 24px; height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (min-width: 600px) {
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+  .candidates-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 900px) {
+  .gallery-grid { grid-template-columns: repeat(4, 1fr); }
+  .candidates-grid { grid-template-columns: repeat(5, 1fr); }
+  body { max-width: 1000px; margin: 0 auto; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" id="back-btn" style="display:none" onclick="goBack()">&#8592;</button>
+  <h1 id="header-title">Frame Reviewer</h1>
+</header>
+
+<main>
+  <div id="episode-list"></div>
+  <div id="gallery" style="display:none"></div>
+  <div id="shot-detail" style="display:none"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const VIEW_OPTIONS = [
+  "full body view", "upper body view", "close-up", "wide shot",
+  "medium shot", "extreme close-up", "small figure in the distance",
+  "side view", "overhead view", "low angle view", "split screen"
+];
+const SPY_OPTIONS = ["", "white", "black"];
+
+let currentView = "episodes";  // episodes | gallery | detail
+let currentEpisode = null;
+let currentShot = null;
+let shotData = null;           // full shot detail from API
+let captionDirty = false;
+let suffixDirty = false;
+
+// ── API helpers ─────────────────────────────────────────────
+
+async function api(path, method = "GET", body = null) {
+  const opts = { method, headers: {} };
+  if (body !== null) {
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(path, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`API error ${res.status}: ${err}`);
+  }
+  return res.json();
+}
+
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1500);
+}
+
+// ── Navigation ──────────────────────────────────────────────
+
+function navigate(view, params = {}) {
+  // Save dirty state before leaving detail
+  if (currentView === "detail") {
+    saveCaptionIfDirty();
+    saveSuffixIfDirty();
+  }
+
+  currentView = view;
+  document.getElementById("episode-list").style.display = view === "episodes" ? "" : "none";
+  document.getElementById("gallery").style.display = view === "gallery" ? "" : "none";
+  document.getElementById("shot-detail").style.display = view === "detail" ? "" : "none";
+  document.getElementById("back-btn").style.display = view === "episodes" ? "none" : "";
+
+  if (view === "episodes") {
+    document.getElementById("header-title").textContent = "Frame Reviewer";
+    location.hash = "";
+    loadEpisodes();
+  } else if (view === "gallery") {
+    currentEpisode = params.episode;
+    document.getElementById("header-title").textContent = currentEpisode;
+    location.hash = `#gallery/${currentEpisode}`;
+    loadGallery(currentEpisode);
+  } else if (view === "detail") {
+    currentEpisode = params.episode;
+    currentShot = params.shot;
+    document.getElementById("header-title").textContent = `${currentEpisode} / Shot ${currentShot}`;
+    location.hash = `#shot/${currentEpisode}/${currentShot}`;
+    loadShotDetail(currentEpisode, currentShot);
+  }
+}
+
+function goBack() {
+  if (currentView === "detail") navigate("gallery", { episode: currentEpisode });
+  else if (currentView === "gallery") navigate("episodes");
+}
+
+// Handle browser back/forward
+window.addEventListener("hashchange", () => {
+  const h = location.hash;
+  if (h.startsWith("#shot/")) {
+    const [, , ep, num] = h.split("/");
+    if (ep && num) navigate("detail", { episode: ep, shot: parseInt(num) });
+  } else if (h.startsWith("#gallery/")) {
+    const ep = h.slice("#gallery/".length);
+    if (ep) navigate("gallery", { episode: ep });
+  } else {
+    navigate("episodes");
+  }
+});
+
+// ── Episode List ────────────────────────────────────────────
+
+async function loadEpisodes() {
+  const container = document.getElementById("episode-list");
+  container.innerHTML = '<div class="loading"><span class="spinner"></span>Loading episodes...</div>';
+
+  const episodes = await api("/api/episodes");
+
+  // Sort: unreviewed first
+  episodes.sort((a, b) => {
+    if (a.reviewed !== b.reviewed) return a.reviewed ? 1 : -1;
+    return a.name.localeCompare(b.name);
+  });
+
+  container.innerHTML = episodes.map(ep => `
+    <div class="ep-card ${ep.reviewed ? 'reviewed' : ''}"
+         data-ep="${ep.name}">
+      <input type="checkbox" class="ep-check"
+             ${ep.reviewed ? 'checked' : ''}
+             onclick="toggleReview(event, '${ep.name}')">
+      <div class="ep-name">${ep.name}</div>
+      <div class="ep-meta">${ep.total_shots - ep.excluded_shots}/${ep.total_shots} shots</div>
+    </div>
+  `).join("");
+
+  // Click card -> gallery (but not on checkbox)
+  container.querySelectorAll(".ep-card").forEach(card => {
+    card.addEventListener("click", e => {
+      if (e.target.classList.contains("ep-check")) return;
+      navigate("gallery", { episode: card.dataset.ep });
+    });
+  });
+}
+
+async function toggleReview(e, episode) {
+  e.stopPropagation();
+  const checked = e.target.checked;
+  await api(`/api/episodes/${episode}/review`, "POST", { reviewed: checked });
+  const card = e.target.closest(".ep-card");
+  card.classList.toggle("reviewed", checked);
+}
+
+// ── Gallery ─────────────────────────────────────────────────
+
+async function loadGallery(episode) {
+  const container = document.getElementById("gallery");
+  container.innerHTML = '<div class="loading"><span class="spinner"></span>Loading shots...</div>';
+
+  const shots = await api(`/api/shots/${episode}`);
+
+  container.innerHTML = `<div class="gallery-grid">${shots.map(s => `
+    <div class="shot-card ${s.excluded ? 'excluded' : ''}"
+         data-shot="${s.shot}"
+         onclick="navigate('detail', {episode:'${episode}', shot:${s.shot}})">
+      ${s.selected_frame
+        ? `<img src="${s.selected_frame}" loading="lazy" alt="Shot ${s.shot}">`
+        : `<div style="aspect-ratio:4/3;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--fg2)">No frame</div>`
+      }
+      <span class="shot-label">#${s.shot}</span>
+      ${s.spy !== 'None' ? `<span class="shot-spy ${s.spy}">${s.spy}</span>` : ''}
+      <div class="shot-caption">${escHtml(s.caption)}</div>
+    </div>
+  `).join("")}</div>`;
+}
+
+// ── Shot Detail ─────────────────────────────────────────────
+
+async function loadShotDetail(episode, shotNum) {
+  const container = document.getElementById("shot-detail");
+  container.innerHTML = '<div class="loading"><span class="spinner"></span>Loading shot...</div>';
+
+  shotData = await api(`/api/shot/${episode}/${shotNum}`);
+  captionDirty = false;
+  suffixDirty = false;
+
+  const selectedCand = shotData.candidates.find(c => c.is_selected);
+  const spy = shotData.spy || "None";
+  const showWhiteHat = spy === "White" || spy === "Both";
+  const showBlackHat = spy === "Black" || spy === "Both";
+
+  container.innerHTML = `
+    <!-- Selected frame -->
+    ${selectedCand
+      ? `<img src="${selectedCand.url}" class="detail-frame" alt="Selected frame">`
+      : `<div class="detail-frame" style="aspect-ratio:4/3;background:var(--bg3);display:flex;align-items:center;justify-content:center">No frame selected</div>`
+    }
+
+    <!-- Dropdowns -->
+    <div class="controls-section">
+      <h3>Classification</h3>
+      <div class="field-row">
+        <label>View</label>
+        <select id="view-select" onchange="onViewChange()">
+          ${VIEW_OPTIONS.map(v =>
+            `<option value="${v}" ${v === shotData.view ? 'selected' : ''}>${v}</option>`
+          ).join("")}
+          ${shotData.view && !VIEW_OPTIONS.includes(shotData.view)
+            ? `<option value="${escAttr(shotData.view)}" selected>${escHtml(shotData.view)}</option>`
+            : ''
+          }
+        </select>
+      </div>
+      <div class="field-row">
+        <label>Spy 1</label>
+        <select id="spy1-select" onchange="onSpy1Change()">
+          <option value="">None</option>
+          <option value="white" ${shotData.spy1 === 'white' ? 'selected' : ''}>White</option>
+          <option value="black" ${shotData.spy1 === 'black' ? 'selected' : ''}>Black</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <label>Spy 2</label>
+        <select id="spy2-select" onchange="onSpy2Change()">
+          <option value="">None</option>
+          <option value="white" ${shotData.spy2 === 'white' ? 'selected' : ''}>White</option>
+          <option value="black" ${shotData.spy2 === 'black' ? 'selected' : ''}>Black</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Caption -->
+    <div class="controls-section">
+      <h3>Caption</h3>
+      <textarea class="caption-textarea" id="caption-edit"
+                oninput="captionDirty=true"
+                onblur="saveCaptionIfDirty()">${escHtml(shotData.caption)}</textarea>
+    </div>
+
+    <!-- Flags -->
+    <div class="controls-section">
+      <h3>Flags</h3>
+      <div class="check-row" id="white-hat-row" style="display:${showWhiteHat ? '' : 'none'}">
+        <input type="checkbox" id="white-hat-cb"
+               ${shotData.white_hat_off ? 'checked' : ''}
+               onchange="onHatChange()">
+        <label for="white-hat-cb">White spy hat off</label>
+      </div>
+      <div class="check-row" id="black-hat-row" style="display:${showBlackHat ? '' : 'none'}">
+        <input type="checkbox" id="black-hat-cb"
+               ${shotData.black_hat_off ? 'checked' : ''}
+               onchange="onHatChange()">
+        <label for="black-hat-cb">Black spy hat off</label>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="nonstandard-cb"
+               ${shotData.nonstandard_outfit ? 'checked' : ''}
+               onchange="onNonstandardChange()">
+        <label for="nonstandard-cb">Non-standard outfit</label>
+      </div>
+      <div class="check-row">
+        <input type="checkbox" id="exclude-cb"
+               ${shotData.excluded ? 'checked' : ''}
+               onchange="onExcludeChange()">
+        <label for="exclude-cb">Exclude from dataset</label>
+      </div>
+    </div>
+
+    <!-- Appearance suffix -->
+    <div class="controls-section">
+      <h3>Appearance Suffix</h3>
+      <textarea class="suffix-textarea" id="suffix-edit"
+                oninput="suffixDirty=true"
+                onblur="saveSuffixIfDirty()">${escHtml(shotData.appearance_suffix || '')}</textarea>
+    </div>
+
+    <!-- Candidates -->
+    <div class="controls-section">
+      <h3>Candidates (${shotData.candidates.length})</h3>
+      <div class="candidates-grid">
+        ${shotData.candidates.map((c, i) => `
+          <div class="cand-thumb ${c.is_selected ? 'selected' : ''}"
+               onclick="selectCandidate('${escAttr(c.name)}')">
+            <img src="${c.url}" loading="lazy" alt="Candidate ${i}">
+            <span class="cand-label">${c.is_selected ? 'SEL' : i + 1}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- Shot nav -->
+    <div class="btn-row" style="justify-content:center; margin-bottom: 20px;">
+      <button class="btn btn-primary" onclick="prevShot()">&#8592; Prev</button>
+      <button class="btn btn-primary" onclick="nextShot()">Next &#8594;</button>
+    </div>
+  `;
+}
+
+// ── Event Handlers ──────────────────────────────────────────
+
+async function onViewChange() {
+  const view = document.getElementById("view-select").value;
+  const result = await api(`/api/shot/${currentEpisode}/${currentShot}/view`, "POST", { view });
+  shotData.view = view;
+  shotData.caption = result.caption;
+  document.getElementById("caption-edit").value = result.caption;
+  toast("View updated");
+}
+
+async function onSpy1Change() {
+  const spy1 = document.getElementById("spy1-select").value || null;
+  const spy2 = document.getElementById("spy2-select").value || null;
+  const result = await api(`/api/shot/${currentEpisode}/${currentShot}/spy`, "POST", { spy1, spy2 });
+  applySpy(result);
+  toast("Spy 1 updated");
+}
+
+async function onSpy2Change() {
+  const spy1 = document.getElementById("spy1-select").value || null;
+  const spy2 = document.getElementById("spy2-select").value || null;
+  const result = await api(`/api/shot/${currentEpisode}/${currentShot}/spy`, "POST", { spy1, spy2 });
+  applySpy(result);
+  toast("Spy 2 updated");
+}
+
+function applySpy(result) {
+  shotData.caption = result.caption;
+  shotData.spy = result.spy;
+  shotData.spy1 = result.spy1;
+  shotData.spy2 = result.spy2;
+  shotData.white_hat_off = result.white_hat_off;
+  shotData.black_hat_off = result.black_hat_off;
+  shotData.appearance_suffix = result.appearance_suffix;
+
+  document.getElementById("caption-edit").value = result.caption;
+  document.getElementById("spy1-select").value = result.spy1 || "";
+  document.getElementById("spy2-select").value = result.spy2 || "";
+  document.getElementById("suffix-edit").value = result.appearance_suffix || "";
+
+  const showWhite = result.spy === "White" || result.spy === "Both";
+  const showBlack = result.spy === "Black" || result.spy === "Both";
+  document.getElementById("white-hat-row").style.display = showWhite ? "" : "none";
+  document.getElementById("black-hat-row").style.display = showBlack ? "" : "none";
+  document.getElementById("white-hat-cb").checked = result.white_hat_off;
+  document.getElementById("black-hat-cb").checked = result.black_hat_off;
+}
+
+async function onHatChange() {
+  const result = await api(`/api/shot/${currentEpisode}/${currentShot}/hats`, "POST", {
+    white_hat_off: document.getElementById("white-hat-cb").checked,
+    black_hat_off: document.getElementById("black-hat-cb").checked,
+  });
+  shotData.appearance_suffix = result.appearance_suffix;
+  document.getElementById("suffix-edit").value = result.appearance_suffix;
+  toast("Hats updated");
+}
+
+async function onNonstandardChange() {
+  const result = await api(`/api/shot/${currentEpisode}/${currentShot}/nonstandard`, "POST", {
+    nonstandard_outfit: document.getElementById("nonstandard-cb").checked,
+  });
+  shotData.appearance_suffix = result.appearance_suffix;
+  document.getElementById("suffix-edit").value = result.appearance_suffix;
+  toast("Outfit flag updated");
+}
+
+async function onExcludeChange() {
+  const result = await api(`/api/shot/${currentEpisode}/${currentShot}/exclude`, "POST");
+  shotData.excluded = result.excluded;
+  document.getElementById("exclude-cb").checked = result.excluded;
+  toast(result.excluded ? "Shot excluded" : "Shot included");
+}
+
+async function saveCaptionIfDirty() {
+  if (!captionDirty) return;
+  captionDirty = false;
+  const caption = document.getElementById("caption-edit").value.trim();
+  await api(`/api/shot/${currentEpisode}/${currentShot}/caption`, "POST", { caption });
+  shotData.caption = caption;
+  toast("Caption saved");
+}
+
+async function saveSuffixIfDirty() {
+  if (!suffixDirty) return;
+  suffixDirty = false;
+  const suffix = document.getElementById("suffix-edit").value.trim();
+  await api(`/api/shot/${currentEpisode}/${currentShot}/suffix`, "POST", { appearance_suffix: suffix });
+  shotData.appearance_suffix = suffix;
+  toast("Suffix saved");
+}
+
+async function selectCandidate(candidateName) {
+  await api(`/api/shot/${currentEpisode}/${currentShot}/select/${candidateName}`, "POST");
+  toast("Frame selected");
+  loadShotDetail(currentEpisode, currentShot);
+}
+
+// ── Shot Navigation ─────────────────────────────────────────
+
+let galleryShots = null;
+
+async function ensureGalleryShots() {
+  if (!galleryShots || galleryShots.episode !== currentEpisode) {
+    const shots = await api(`/api/shots/${currentEpisode}`);
+    galleryShots = { episode: currentEpisode, shots };
+  }
+  return galleryShots.shots;
+}
+
+async function prevShot() {
+  const shots = await ensureGalleryShots();
+  const idx = shots.findIndex(s => s.shot === currentShot);
+  if (idx > 0) {
+    navigate("detail", { episode: currentEpisode, shot: shots[idx - 1].shot });
+  } else {
+    toast("First shot");
+  }
+}
+
+async function nextShot() {
+  const shots = await ensureGalleryShots();
+  const idx = shots.findIndex(s => s.shot === currentShot);
+  if (idx < shots.length - 1) {
+    navigate("detail", { episode: currentEpisode, shot: shots[idx + 1].shot });
+  } else {
+    toast("Last shot");
+  }
+}
+
+// ── Utility ─────────────────────────────────────────────────
+
+function escHtml(s) {
+  if (!s) return "";
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+}
+function escAttr(s) {
+  return escHtml(s);
+}
+
+// ── Init ────────────────────────────────────────────────────
+
+(function init() {
+  const h = location.hash;
+  if (h.startsWith("#shot/")) {
+    const [, , ep, num] = h.split("/");
+    if (ep && num) { navigate("detail", { episode: ep, shot: parseInt(num) }); return; }
+  } else if (h.startsWith("#gallery/")) {
+    const ep = h.slice("#gallery/".length);
+    if (ep) { navigate("gallery", { episode: ep }); return; }
+  }
+  navigate("episodes");
+})();
+</script>
+</body>
+</html>

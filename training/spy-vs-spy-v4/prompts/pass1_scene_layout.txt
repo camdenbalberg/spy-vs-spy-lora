@@ -1,0 +1,77 @@
+You are analyzing a short animated clip from the show "Spy vs Spy" (based on the MAD Magazine comic). The animation features two identical-looking spy characters — one white and one black — who constantly try to outsmart each other with traps and schemes.
+
+Your task is to describe ONLY the scene layout and action for each distinct scene/shot in this clip. You will be given additional prompts later to cover other details — do NOT describe expressions, emotions, outfits, objects in detail, or background environment in this pass.
+
+WHAT IS A SCENE/SHOT:
+A new scene/shot starts when the camera CUTS to a different view. This means any change in:
+- Camera angle (even subtle shifts count)
+- Framing (e.g., wide shot to medium shot, or full body to upper body)
+- Location or setting
+- Which characters are visible
+- Zoom level (cutting from far to close or vice versa)
+
+This animation uses rapid, frequent cuts — typically every 1-3 seconds. Even quick establishing shots or reaction shots that last only 1 second should be their own scene.
+
+CRITICAL: Do NOT combine multiple shots into one row. If your action description contains words like "then", "and then", "before", "after", or semicolons joining separate actions, you are almost certainly combining multiple shots. Split them.
+
+A typical 30-second clip has 10-25 camera cuts. If you find fewer than 8 scenes, you are very likely missing cuts — re-examine the video more carefully frame by frame.
+
+For each scene, provide:
+
+1. **Timestamp** — The approximate start time (e.g., 0:00, 0:05, 0:12)
+2. **Spies present** — Which SPY is in the scene: "White", "Black", "Both", or "None". This is ONLY for the two spy characters. "Both" means BOTH spies are visible.
+3. **Other characters** — Any non-spy characters visible: "uniformed general", "gorilla", "woman", "vendor", etc. Leave empty if none.
+4. **Framing** — Choose exactly ONE from this list:
+   - full body view
+   - upper body view
+   - close-up
+   - wide shot
+   - medium shot
+   - extreme close-up
+   - small figure in the distance
+   - side view
+   - overhead view
+   - low angle view
+   - split screen
+5. **Action** — What is each character (spies AND non-spy characters) physically DOING? Keep it short and action-focused.
+6. **Spatial layout** — Where is each character positioned in the frame?
+7. **Direction facing** — Which direction is each character facing or moving?
+
+Format your response as a CSV with these columns:
+timestamp,spies,other_characters,framing,action,spatial,direction
+
+Here is a COMPLETE example of correct output for a ~37-second clip (25 scenes). Notice how each camera cut gets its own row, even when cuts happen every 1 second:
+
+0:00,None,,close-up,N/A,center of frame,N/A
+0:01,White,,medium shot,white spy holding and manipulating a tiny object with tweezers,white spy right of center with table in foreground,facing slightly left
+0:05,White,,full body view,white spy walking and sneaking,white spy left of center,moving right
+0:07,White,,close-up,white spy's hand opening a drawer and placing an object inside,hand entering a drawer on the right,moving right
+0:14,Black,,close-up,black spy's feet wiggling,feet right of center,feet facing left
+0:15,Black,,medium shot,black spy sitting up in bed,black spy center right,facing forward
+0:16,Black,,medium shot,black spy stretching arms upwards,black spy center right,facing forward
+0:17,Black,,medium shot,black spy opening a drawer,black spy center right,facing slightly left
+0:18,Black,,medium shot,black spy pulling items from a drawer,black spy center right,facing slightly left
+0:19,Black,,medium shot,black spy putting on a glove,black spy center right,facing slightly left
+0:20,Black,,medium shot,black spy taking an item from a drawer,black spy center right,facing slightly left
+0:21,Black,,medium shot,black spy putting on a glove,black spy center right,facing slightly left
+0:23,White,,full body view,white spy walking and carrying an item,white spy left of center,moving right
+0:24,White,,medium shot,white spy standing next to an item and checking a wrist device,white spy left of center,facing right
+0:25,None,,close-up,wrist device showing time,center of frame,N/A
+0:28,White,,medium shot,white spy standing still,white spy left of center,facing right
+0:29,White,,medium shot,white spy picking up a large item,white spy left of center,facing right
+0:30,Black,,full body view,black spy walking along a path,black spy right of center,moving left
+0:32,Both,,full body view,white spy standing on a platform and black spy walking along a path,white spy on left and black spy on right,white spy facing right and black spy moving left
+0:33,Both,,full body view,white spy pointing an item and black spy reacting,white spy on left and black spy on right,white spy facing right and black spy facing left
+0:34,Both,,full body view,white spy pointing an item and black spy reacting intensely,white spy on left and black spy on right,white spy facing right and black spy facing left
+0:35,Both,,full body view,white spy pointing an item and black spy falling apart,white spy on left and black spy on right,white spy facing right and black spy facing left
+0:36,White,,medium shot,white spy standing next to a pile of debris,white spy left of center,facing right
+0:37,White,,medium shot,white spy standing still,white spy left of center,facing right
+
+IMPORTANT RULES:
+- One row per CAMERA CUT — not per animation beat
+- Keep the action column concise
+- Do NOT describe what characters are holding (that's for the Objects pass)
+- Do NOT describe facial expressions or emotions (that's for the Expressions pass)
+- Do NOT describe clothing or outfit details (that's for the Outfits pass)
+- Do NOT describe the background setting in detail (that's for the Background pass)
+- Focus ONLY on: who, where in frame, what pose/action, which direction

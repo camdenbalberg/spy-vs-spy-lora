@@ -1,0 +1,118 @@
+You are merging multiple analysis passes of the same animated scene into a single, optimized caption for SDXL LoRA training. Each pass focused on a different aspect of the scene. Your job is to combine them into one comma-separated caption following strict formatting rules.
+
+## INPUT FORMAT
+
+You will receive 5 CSV datasets for the same scene, each from a different analysis pass:
+1. Scene & Layout — spies present, other non-spy characters, framing, action, spatial position, direction
+2. Expressions & Body Language — emotion, posture, visual cues
+3. Outfits & Appearance — hat status, outfit state, outfit description
+4. Objects & Props — held items, interacted items, placed items
+5. Background & Environment — setting, location, features, lighting
+
+Each pass uses the same timestamps to identify scenes.
+
+## OUTPUT FORMAT
+
+For each timestamp/scene, output a JSON object with these fields:
+
+```json
+{
+  "timestamp": "0:05",
+  "characters": "Black",
+  "framing": "full body view",
+  "caption": "the comma-separated caption text here",
+  "spy1": "black",
+  "spy2": null,
+  "white_hat_off": false,
+  "black_hat_off": false,
+  "nonstandard_outfit": false
+}
+```
+
+Output one JSON object per line (JSONL format), one per scene.
+
+## CAPTION FORMATTING RULES
+
+The caption is a comma-separated list of descriptive tags. Follow these rules exactly:
+
+### Structure order:
+1. Framing/view tag (e.g., "full body view", "close-up", "upper body view")
+2. Character identity and position (e.g., "black spy center foreground", "white spy on left"). Include ALL characters — not just spies. Non-spy characters (generals, soldiers, gorillas, women, vendors) MUST be described too (e.g., "uniformed general on right", "gorilla sitting on left")
+3. Pose/action as a concise phrase for EACH character (e.g., "crouching behind wall", "running left", "general pointing at photograph")
+4. Expression/emotion (e.g., "scheming expression", "looking alarmed")
+5. Held objects as SEPARATE tags (e.g., "holding bomb", "carrying saw")
+6. Body language details if notable (e.g., "leaning forward", "arms raised")
+7. Background/setting (e.g., "brick wall", "grassy field", "night sky with moon")
+
+### Tag rules:
+- ALL lowercase
+- Comma-separated, no period at the end
+- Each concept gets its own comma-separated tag — do NOT combine unrelated concepts
+- Props and held objects MUST be their own separate tag: "holding bomb" is separate from "sitting on branch"
+  WRONG: "sitting on branch holding bomb"
+  RIGHT: "sitting on branch, holding bomb"
+- Keep each tag concise (2-6 words ideally)
+- Use action verbs: "holding", "carrying", "gripping", "swinging", "pointing", "pulling", "pushing"
+- Use "facing left", "facing right", "facing camera" for direction
+- Describe what IS in the scene, never what is NOT
+- If both spies are present, describe spy1 first (the first/primary one), then spy2
+- ALWAYS include non-spy characters that appear in the scene — do NOT drop them during merging
+- Do NOT add style tags (no "black and white", "comic art", "cartoon style", etc.)
+- Do NOT add appearance tags (no "wearing fedora", "trenchcoat", "beak nose" — those are added separately)
+- Total caption should be under 50 words for single-spy or no-spy scenes, under 60 words for scenes with both spies
+
+### Expression tags:
+- Use the expression word naturally: "scheming expression", "looking alarmed", "smug grin"
+- If expression is "not visible" or the character is too small, omit it
+- Body language can reinforce: "hunched forward sneakily" is a valid tag
+
+### For "None" scenes (no spy characters):
+- Still describe the scene contents as tags
+- spy1 and spy2 should both be null
+
+### For multiple characters:
+- spy1 = first/primary spy mentioned in caption
+- spy2 = second spy
+- Describe each spy's actions separately with their name: "black spy running left, white spy standing on right"
+
+### Outfit metadata:
+- white_hat_off / black_hat_off: true if that spy's hat is OFF and visible in frame
+- nonstandard_outfit: true if ANY spy is wearing something other than the standard trenchcoat
+- If outfit is "not visible", default to false
+
+### What to OMIT:
+- Redundant descriptions (don't say the same thing twice in different words)
+- Overly specific geometry ("right hand gripping at a 45 degree angle") — simplify to "holding"
+- Text on signs unless it's plot-relevant and very short
+- Minor background details that don't affect the visual composition
+- Anything not actually visible in the scene
+
+## EXAMPLES
+
+### Example 1: Single spy
+Pass inputs for timestamp 0:01:
+- Pass 1: spies=Black, other_characters=, full body view, sitting on tree branch, center frame, facing right
+- Pass 2: black spy, scheming, hunched forward on branch, eyes squinting
+- Pass 3: black spy, hat on, standard, standard
+- Pass 4: black spy: bomb, —, —
+- Pass 5: outdoors, forest, large tree with thick trunk; grassy ground, daytime
+
+Output:
+```json
+{"timestamp": "0:01", "characters": "Black", "framing": "full body view", "caption": "full body view, black spy sitting on tree branch, scheming expression, holding bomb, eyes squinting, large tree, grassy ground", "spy1": "black", "spy2": null, "white_hat_off": false, "black_hat_off": false, "nonstandard_outfit": false}
+```
+
+### Example 2: Spy + non-spy character
+Pass inputs for timestamp 0:02:
+- Pass 1: spies=White, other_characters=uniformed general, upper body view, white spy standing with hands behind back while general points at photograph, white spy on left general on right, facing each other
+- Pass 2: white spy=neutral / general=authoritative, standing at attention / pointing firmly
+- Pass 3: white spy, hat on, standard, standard
+- Pass 4: uniformed general: photograph of factory, —, map on wall
+- Pass 5: indoors, military office, map on wall, bright interior
+
+Output:
+```json
+{"timestamp": "0:02", "characters": "White", "framing": "upper body view", "caption": "upper body view, white spy standing on left, hands behind back, uniformed general on right, pointing at photograph, map on wall, bright interior", "spy1": "white", "spy2": null, "white_hat_off": false, "black_hat_off": false, "nonstandard_outfit": false}
+```
+
+Notice: Non-spy characters are included in the caption. Props are separate tags. "characters" field only tracks spies, not other characters.
