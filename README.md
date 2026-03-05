@@ -65,6 +65,13 @@ Learning rates and base models vary by version — see each version's README for
 
 Trained LoRA checkpoints are loaded in ComfyUI for visual evaluation. Test across multiple epoch checkpoints (early, mid, late) and LoRA strength values (0.6–0.9) to find the sweet spot before overfitting.
 
+## Downloads
+
+- **Trained LoRA checkpoints:** [camdenbalberg/spy-vs-spy-lora](https://huggingface.co/camdenbalberg/spy-vs-spy-lora) on Hugging Face
+- **Training datasets:** [camdenbalberg/spy-vs-spy-dataset](https://huggingface.co/datasets/camdenbalberg/spy-vs-spy-dataset) on Hugging Face
+- **Base model (v1-v2):** [SDXL 1.0](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0)
+- **Base model (v3-v4):** [NovaAnimeXL](https://civitai.com/models/205733/novaanimexl) on CivitAI
+
 ## Project Structure
 
 ```
@@ -80,7 +87,6 @@ Trained LoRA checkpoints are loaded in ComfyUI for visual evaluation. Test acros
 │       ├── prompts/             # Gemini/Claude prompt templates
 │       ├── web/                 # Reviewer frontend
 │       └── train.toml           # kohya_ss training config
-├── docs/                        # Additional documentation
 ├── find_black_frames.py         # Utility: detect black/empty frames
 ├── queue_phases.py              # Utility: batch pipeline phases
 └── queue_plots.py               # Utility: training loss plots
